@@ -1,0 +1,143 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "de-llm"
+version = "1.0.0"
+description = "A comprehensive Python module demonstrating standard library usage, container operations, and common algorithms"
+readme = "README.md"
+authors = [
+    {name = "de-LLM Contributors", email = "contact@example.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering",
+]
+keywords = ["algorithms", "data-structures", "python", "education", "learning"]
+
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.20.0",
+    "pandas>=1.3.0",
+    "matplotlib>=3.4.0",
+    "scikit-learn>=1.0.0",
+    "scipy>=1.7.0",
+    "seaborn>=0.11.0",
+    "plotly>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0",
+    "isort>=5.0.0",
+]
+
+docs = [
+    "sphinx>=5.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+]
+
+all = [
+    "de-llm[dev,docs]",
+]
+
+[project.urls]
+Homepage = "https://github.com/junius/de-LLM"
+Repository = "https://github.com/junius/de-LLM"
+Documentation = "https://github.com/junius/de-LLM#readme"
+"Bug Tracker" = "https://github.com/junius/de-LLM/issues"
+
+[project.scripts]
+demo-general = "demo_general:main"
+
+[tool.setuptools]
+packages = ["general", "basic_torch"]
+
+[tool.setuptools.package-data]
+general = ["*.md"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = [
+    "--cov=general",
+    "--cov=basic_torch",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.coverage.run]
+source = ["general", "basic_torch"]
+omit = ["*/tests/*", "*/test_*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]
