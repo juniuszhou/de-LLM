@@ -63,9 +63,70 @@ def generate_square_subsequent_mask(sz):
     mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
     return mask
 
+def check_cuda_usage():
+    """Utility function to check CUDA usage and GPU information"""
+    print("=" * 50)
+    print("CUDA STATUS CHECK")
+    print("=" * 50)
+    
+    # Basic CUDA availability
+    print(f"PyTorch version: {torch.__version__}")
+    print(f"CUDA available: {torch.cuda.is_available()}")
+    
+    if torch.cuda.is_available():
+        print(f"CUDA version: {torch.version.cuda}")
+        print(f"cuDNN version: {torch.backends.cudnn.version()}")
+        print(f"Number of GPUs: {torch.cuda.device_count()}")
+        
+        for i in range(torch.cuda.device_count()):
+            print(f"GPU {i}: {torch.cuda.get_device_name(i)}")
+            props = torch.cuda.get_device_properties(i)
+            print(f"  - Total memory: {props.total_memory / 1024**3:.1f} GB")
+            print(f"  - Compute capability: {props.major}.{props.minor}")
+        
+        # Current device info
+        current_device = torch.cuda.current_device()
+        print(f"Current device: {current_device}")
+        print(f"Memory allocated: {torch.cuda.memory_allocated() / 1024**2:.1f} MB")
+        print(f"Memory cached: {torch.cuda.memory_reserved() / 1024**2:.1f} MB")
+    else:
+        print("CUDA is not available. Reasons could be:")
+        print("1. No NVIDIA GPU installed")
+        print("2. CUDA drivers not installed")
+        print("3. PyTorch installed without CUDA support")
+        print("4. GPU is being used by another process")
+    
+    print("=" * 50)
+
+def monitor_gpu_usage(operation_name="Operation"):
+    """Decorator/context manager to monitor GPU usage during operations"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if torch.cuda.is_available():
+                torch.cuda.reset_peak_memory_stats()
+                start_memory = torch.cuda.memory_allocated()
+                print(f"\n[{operation_name}] Starting GPU memory: {start_memory / 1024**2:.1f} MB")
+            
+            result = func(*args, **kwargs)
+            
+            if torch.cuda.is_available():
+                end_memory = torch.cuda.memory_allocated()
+                peak_memory = torch.cuda.max_memory_allocated()
+                print(f"[{operation_name}] Ending GPU memory: {end_memory / 1024**2:.1f} MB")
+                print(f"[{operation_name}] Peak GPU memory: {peak_memory / 1024**2:.1f} MB")
+                print(f"[{operation_name}] Memory used: {(end_memory - start_memory) / 1024**2:.1f} MB")
+            
+            return result
+        return wrapper
+    return decorator
+
 def main():
-    # Example usage
+    # Check CUDA availability and GPU information
+    check_cuda_usage()
+    
+    # Set device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"\nUsing device: {device}")
     
     # Test both positional encoding types
     print("=== Testing Sinusoidal Positional Encoding ===")
@@ -80,12 +141,22 @@ def main():
     src_mask = generate_square_subsequent_mask(src.size(0)).to(device)
     
     # Forward pass with sinusoidal encoding
+    if torch.cuda.is_available():
+        torch.cuda.reset_peak_memory_stats()  # Reset memory tracking
+    
     output_sin = model_sin(src, src_mask)
     print(f"Sinusoidal output shape: {output_sin.shape}")
+    
+    if torch.cuda.is_available():
+        print(f"GPU memory after sinusoidal forward: {torch.cuda.memory_allocated() / 1024**2:.1f} MB")
+        print(f"Peak GPU memory: {torch.cuda.max_memory_allocated() / 1024**2:.1f} MB")
     
     # Forward pass with learnable encoding
     output_learnable = model_learnable(src, src_mask)
     print(f"Learnable output shape: {output_learnable.shape}")
+    
+    if torch.cuda.is_available():
+        print(f"GPU memory after learnable forward: {torch.cuda.memory_allocated() / 1024**2:.1f} MB")
     
     # Compare parameter counts
     sin_params = sum(p.numel() for p in model_sin.parameters() if p.requires_grad)
