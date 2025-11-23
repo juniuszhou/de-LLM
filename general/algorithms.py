@@ -8,8 +8,8 @@ sorting, searching, and other fundamental computer science algorithms.
 from typing import List, Optional, Tuple, Any
 import random
 import time
+import unittest
 from functools import wraps
-
 
 def timing_decorator(func):
     """Decorator to measure function execution time."""
@@ -403,5 +403,89 @@ def demonstrate_all_algorithms() -> None:
     demonstrate_graph_algorithms()
 
 
+class TestBubbleSort(unittest.TestCase):
+    """Unit tests for bubble_sort function."""
+    
+    def test_empty_array(self):
+        """Test bubble sort with empty array."""
+        result = bubble_sort([])
+        self.assertEqual(result, [])
+    
+    def test_single_element(self):
+        """Test bubble sort with single element."""
+        result = bubble_sort([42])
+        self.assertEqual(result, [42])
+    
+    def test_already_sorted(self):
+        """Test bubble sort with already sorted array."""
+        arr = [1, 2, 3, 4, 5]
+        result = bubble_sort(arr)
+        self.assertEqual(result, [1, 2, 3, 4, 5])
+        # Verify original array is not modified
+        self.assertEqual(arr, [1, 2, 3, 4, 5])
+    
+    def test_reverse_sorted(self):
+        """Test bubble sort with reverse sorted array."""
+        result = bubble_sort([5, 4, 3, 2, 1])
+        self.assertEqual(result, [1, 2, 3, 4, 5])
+    
+    def test_random_array(self):
+        """Test bubble sort with random unsorted array."""
+        result = bubble_sort([64, 34, 25, 12, 22, 11, 90])
+        self.assertEqual(result, [11, 12, 22, 25, 34, 64, 90])
+    
+    def test_duplicates(self):
+        """Test bubble sort with duplicate elements."""
+        result = bubble_sort([3, 1, 4, 1, 5, 9, 2, 6, 5])
+        self.assertEqual(result, [1, 1, 2, 3, 4, 5, 5, 6, 9])
+    
+    def test_all_same_elements(self):
+        """Test bubble sort with all identical elements."""
+        result = bubble_sort([7, 7, 7, 7, 7])
+        self.assertEqual(result, [7, 7, 7, 7, 7])
+    
+    def test_two_elements_sorted(self):
+        """Test bubble sort with two elements already sorted."""
+        result = bubble_sort([1, 2])
+        self.assertEqual(result, [1, 2])
+    
+    def test_two_elements_unsorted(self):
+        """Test bubble sort with two elements unsorted."""
+        result = bubble_sort([2, 1])
+        self.assertEqual(result, [1, 2])
+    
+    def test_negative_numbers(self):
+        """Test bubble sort with negative numbers."""
+        result = bubble_sort([-3, -1, -4, -1, -5, 0, 2])
+        self.assertEqual(result, [-5, -4, -3, -1, -1, 0, 2])
+    
+    def test_original_array_unchanged(self):
+        """Test that original array is not modified."""
+        original = [3, 1, 4, 1, 5]
+        original_copy = original.copy()
+        result = bubble_sort(original)
+        self.assertEqual(original, original_copy)  # Original unchanged
+        self.assertEqual(result, [1, 1, 3, 4, 5])  # Result is sorted
+
+
+def run_bubble_sort_tests():
+    """Run all bubble sort unit tests."""
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestBubbleSort)
+    runner = unittest.TextTestRunner(verbosity=2)
+    return runner.run(suite)
+
+# python general/algorithms.py test
 if __name__ == "__main__":
-    demonstrate_all_algorithms()
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        # Run tests if "test" argument is provided
+        print("Running Bubble Sort Unit Tests...")
+        print("=" * 50)
+        result = run_bubble_sort_tests()
+        print("=" * 50)
+        if result.wasSuccessful():
+            print("All tests passed! ✅")
+        else:
+            print("Some tests failed! ❌")
+            sys.exit(1)

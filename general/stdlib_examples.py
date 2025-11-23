@@ -20,6 +20,7 @@ import urllib.parse
 import base64
 import hashlib
 import uuid
+import logging
 from typing import List, Dict, Any, Iterator, Callable
 
 
@@ -369,6 +370,141 @@ def random_module_examples() -> None:
     print(f"Exponential (lambda=1): {random.expovariate(1):.4f}")
 
 
+def logging_module_examples() -> None:
+    """Demonstrate logging module functionality."""
+    print("\n=== Logging Module Examples ===")
+    
+    print("\n--- Method 1: Using basicConfig() at program start ---")
+    print("""
+# Set log level BEFORE any logging calls
+import logging
+
+# Option A: Set level directly
+logging.basicConfig(level=logging.DEBUG)
+
+# Option B: Set level from string (useful for config files)
+logging.basicConfig(level=logging.getLevelName('INFO'))
+
+# Option C: Set level from environment variable
+import os
+log_level = os.getenv('LOG_LEVEL', 'INFO')
+logging.basicConfig(level=getattr(logging, log_level.upper()))
+    """)
+    
+    # Demonstrate different log levels
+    print("\n--- Log Levels (from lowest to highest) ---")
+    levels = [
+        ('DEBUG', logging.DEBUG, 'Detailed diagnostic info'),
+        ('INFO', logging.INFO, 'General informational messages'),
+        ('WARNING', logging.WARNING, 'Warning messages'),
+        ('ERROR', logging.ERROR, 'Error messages'),
+        ('CRITICAL', logging.CRITICAL, 'Critical error messages'),
+    ]
+    
+    for level_name, level_value, description in levels:
+        print(f"  {level_name:10s} ({level_value:2d}): {description}")
+    
+    print("\n--- Setting Log Level Before Program Start ---")
+    print("""
+# Method 1: Using basicConfig() - MUST be called before any logging
+logging.basicConfig(
+    level=logging.DEBUG,  # Set the root logger level
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+# Method 2: Set root logger level directly
+logging.root.setLevel(logging.INFO)
+
+# Method 3: From environment variable (common in production)
+import os
+log_level = os.environ.get('LOG_LEVEL', 'WARNING').upper()
+logging.basicConfig(level=getattr(logging, log_level))
+
+# Method 4: From command-line argument
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--log-level', default='INFO', 
+                    choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'])
+args = parser.parse_args()
+logging.basicConfig(level=getattr(logging, args.log_level))
+
+# Method 5: From configuration file
+import json
+with open('config.json') as f:
+    config = json.load(f)
+logging.basicConfig(level=getattr(logging, config['log_level']))
+    """)
+    
+    # Demonstrate actual logging with different levels
+    print("\n--- Example: Logging with Different Levels ---")
+    
+    # Set up a temporary logger for demonstration
+    demo_logger = logging.getLogger('demo')
+    demo_logger.setLevel(logging.DEBUG)
+    
+    # Create a console handler if basicConfig hasn't been called
+    if not logging.root.handlers:
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(levelname)-8s: %(message)s')
+        handler.setFormatter(formatter)
+        demo_logger.addHandler(handler)
+        demo_logger.propagate = False
+    
+    print("Demonstrating log messages (if level allows):")
+    demo_logger.debug("This is a DEBUG message")
+    demo_logger.info("This is an INFO message")
+    demo_logger.warning("This is a WARNING message")
+    demo_logger.error("This is an ERROR message")
+    demo_logger.critical("This is a CRITICAL message")
+    
+    print("\n--- Best Practices ---")
+    print("""
+1. Set log level at the VERY START of your program, before any imports that use logging
+2. Use environment variables for production: LOG_LEVEL=INFO python script.py
+3. Use command-line arguments for flexibility: python script.py --log-level DEBUG
+4. Use basicConfig() only once (it only works the first time)
+5. For libraries, use getLogger(__name__) instead of root logger
+    """)
+    
+    # Show practical example
+    print("\n--- Practical Example: Setting Log Level Before Program Start ---")
+    print("""
+# File: my_program.py
+import logging
+import os
+import sys
+
+# Set log level BEFORE anything else
+def setup_logging():
+    # Priority: command-line arg > environment variable > default
+    log_level = 'INFO'  # default
+    
+    if '--log-level' in sys.argv:
+        idx = sys.argv.index('--log-level')
+        log_level = sys.argv[idx + 1] if idx + 1 < len(sys.argv) else 'INFO'
+    elif 'LOG_LEVEL' in os.environ:
+        log_level = os.environ['LOG_LEVEL']
+    
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper()),
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+# Call setup_logging() at the very beginning
+if __name__ == '__main__':
+    setup_logging()  # Set log level FIRST
+    
+    logger = logging.getLogger(__name__)
+    logger.info("Program started")
+    logger.debug("This won't show if level is INFO or higher")
+    
+    # Rest of your program...
+    """)
+
+
 def demonstrate_all_stdlib() -> None:
     """Run all standard library demonstrations."""
     print("Python Standard Library Examples")
@@ -387,6 +523,7 @@ def demonstrate_all_stdlib() -> None:
     crypto_examples()
     url_examples()
     random_module_examples()
+    logging_module_examples()
 
 
 if __name__ == "__main__":

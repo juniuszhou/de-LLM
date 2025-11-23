@@ -7,7 +7,7 @@ from the collections module.
 """
 
 from collections import defaultdict, Counter, deque, namedtuple, OrderedDict
-from typing import List, Dict, Set, Tuple, Any
+from typing import List, Dict, Set, Tuple, Any, MutableMapping
 
 
 def list_operations() -> None:
