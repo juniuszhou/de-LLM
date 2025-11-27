@@ -20,6 +20,7 @@ uv sync
 
 uv add torchtext
 uv add transformers
+uv add huggingface_hub
 
 ## examples
 
