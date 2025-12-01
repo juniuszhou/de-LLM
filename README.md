@@ -21,13 +21,13 @@ uv sync
 uv add torchtext
 uv add transformers
 uv add huggingface_hub
+uv add langchain
+uv add langchain-community
+uv add langchain-openai
 
 ## examples
 
 https://docs.tplr.ai/
-
-
-
 
 
 ## colab plugin usage

@@ -45,6 +45,10 @@ dependencies = [
     "llm-autoeval>=0.1.0",
     "huggingface-hub>=0.1.0",
     "ipywidgets>=8.1.8",
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.31",
+    "langchain-openai>=0.3.35",
+    "pytest>=8.4.2",
 ]
 
 [project.optional-dependencies]
