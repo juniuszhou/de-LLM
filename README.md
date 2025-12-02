@@ -32,3 +32,16 @@ https://docs.tplr.ai/
 
 ## colab plugin usage
 !nvidia-smi
+
+
+## plan 12-1 to 12-7
+day: 
+## pytorch
+https://learn.deeplearning.ai/specializations/pytorch-for-deep-learning-professional-certificate/overview
+
+
+weekend: complete gpt2  nanoGPT implementation follow the video from karpathy
+
+
+12-8 to 12-14
+## pytorch
