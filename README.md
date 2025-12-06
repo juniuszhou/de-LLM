@@ -35,9 +35,7 @@ https://docs.tplr.ai/
 
 
 ## plan 12-1 to 12-7
-day: 
-## pytorch
-https://learn.deeplearning.ai/specializations/pytorch-for-deep-learning-professional-certificate/overview
+day: langchain
 
 
 weekend: complete gpt2  nanoGPT implementation follow the video from karpathy

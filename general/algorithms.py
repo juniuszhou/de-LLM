@@ -119,9 +119,27 @@ def heap_sort(arr: List[int]) -> List[int]:
 
 def heapify(arr: List[int], n: int, i: int) -> None:
     """Helper function for heap sort."""
-    largest = i
-    left = 2 * i + 1
-    right = 2 * i + 2
+
+    text: str = ""
+    b: bool = True
+    c: dict = {}
+    d: list = []
+    e: tuple = ()
+    f: set = set()
+    g: int = 0
+    h: float = 0.0
+    i: complex = 0j
+    j: range = range(10)
+    k: slice = slice(10)
+    l: bytes = b""
+    m: bytearray = bytearray(10)
+    n: memoryview = memoryview(b"")
+    o: None = None
+    p: Any = None
+    q: Optional[int] = None
+    q = 10
+    left: int = 2 * i + 1
+    right: int = 2 * i + 2
     
     if left < n and arr[left] > arr[largest]:
         largest = left
