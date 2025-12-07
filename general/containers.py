@@ -7,9 +7,25 @@ from the collections module.
 """
 
 from collections import defaultdict, Counter, deque, namedtuple, OrderedDict
-from typing import List, Dict, Set, Tuple, Any, MutableMapping
+from typing import List, Dict, Set, Tuple, Any, MutableMapping, TypedDict, Union
 
-
+def typed_dict_example() -> None:
+    """Demonstrate typed dictionary operations."""
+    print("=== Typed Dictionary Example ===")
+    
+    class User(TypedDict):
+        name: str
+        age: int
+        email: str
+        
+    user: User = {
+        "name": "John Doe",
+        "age": 30,
+        "email": "john.doe@example.com"
+    }
+    print(f"User: {user}")
+    
+    
 def list_operations() -> None:
     """Demonstrate various list operations."""
     print("=== List Operations ===")
