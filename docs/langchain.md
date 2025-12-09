@@ -39,3 +39,5 @@ standard executable component
 - system message
 - function message
 - tool message
+
+## state saver, memory or sqlite

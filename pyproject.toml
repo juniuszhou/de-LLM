@@ -57,6 +57,7 @@ dependencies = [
     "xformers>=0.0.32.post2",
     "langchain-anthropic>=0.3.22",
     "tavily>=1.1.0",
+    "langchain-chroma>=0.2.6",
 ]
 
 [project.optional-dependencies]
