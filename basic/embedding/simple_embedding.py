@@ -13,11 +13,11 @@ embedding = nn.Embedding(vocab_size, embedding_dim)
 # 输入：索引张量
 input_indices = torch.tensor([0, 2, 4])  # 形状: (3,)
 
-print(input_indices.shape) # ([3,])
+print(input_indices.shape)  # ([3,])
 # 前向传播
 output = embedding(input_indices)
 print(output)
-print(output.shape) # ([3, 100])
+print(output.shape)  # ([3, 100])
 
 # vocab_size=10000: 参数=7,680,000, 内存≈29.2 MB
 # vocab_size=30000: 参数=23,040,000, 内存≈87.7 MB

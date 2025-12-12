@@ -70,6 +70,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 for param in model.parameters():
     print(param.shape)
 
+
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     # set the model to training mode, model also can be evaluation mode

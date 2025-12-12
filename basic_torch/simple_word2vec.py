@@ -240,6 +240,7 @@ def show_training_process():
 
 if __name__ == "__main__":
     # Set seed for reproducibility
+    
     torch.manual_seed(42)
     
     # Run demonstrations
