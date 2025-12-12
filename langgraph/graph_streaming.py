@@ -1,15 +1,19 @@
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
+
 class State(TypedDict):
     topic: str
     joke: str
 
+
 def refine_topic(state: State):
     return {"topic": state["topic"] + " and cats"}
 
+
 def generate_joke(state: State):
     return {"joke": f"This is a joke about {state['topic']}"}
+
 
 graph = (
     StateGraph(State)
@@ -23,11 +27,10 @@ graph = (
 
 # The stream() method returns an iterator that yields streamed outputs
 # actually they are states of the graph in each node
-for chunk in graph.stream(  
+for chunk in graph.stream(
     {"topic": "ice cream"},
     # Set stream_mode="updates" to stream only the updates to the graph state after each node
     # Other stream modes are also available. See supported stream modes for details
-    stream_mode="updates",  
+    stream_mode="updates",
 ):
     print(chunk)
-

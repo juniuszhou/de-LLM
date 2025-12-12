@@ -1,11 +1,13 @@
 from typing import TypedDict, Dict, Optional
 from langgraph.graph import StateGraph, START, END
 
+
 # define a state
 class AgentState(TypedDict):
-    message: str 
+    message: str
     context: str
     history: Optional[str]
+
 
 # define a node
 async def greeting_node(state: AgentState) -> AgentState:
@@ -14,6 +16,7 @@ async def greeting_node(state: AgentState) -> AgentState:
     state["context"] = "Hello, my name is John"
     state["history"] = "History added into state"
     return state
+
 
 graph = (
     StateGraph(AgentState)
@@ -36,4 +39,3 @@ graph = (
 # app = graph.compile()
 
 # result = app.invoke({"message1": "Hello, my name is John"})
-

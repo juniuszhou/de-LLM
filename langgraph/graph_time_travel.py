@@ -3,7 +3,12 @@ import uuid
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import InMemorySaver
 from typing import TypedDict, Annotated, Sequence, NotRequired
-from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, ToolMessage
+from langchain_core.messages import (
+    BaseMessage,
+    SystemMessage,
+    HumanMessage,
+    ToolMessage,
+)
 from operator import add as add_messages
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
@@ -18,7 +23,7 @@ model = ChatOpenAI(
     model="llama3.2:3b",
     temperature=0,
     base_url="http://localhost:11434/v1",
-    api_key="ollama"
+    api_key="ollama",
 )
 
 
@@ -89,6 +94,5 @@ new_config = graph.update_state(selected_state.config, values={"topic": "chicken
 print(new_config)
 
 print("=" * 50)
-result =graph.invoke(None, new_config)
+result = graph.invoke(None, new_config)
 print(result)
-

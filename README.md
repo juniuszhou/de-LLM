@@ -29,17 +29,20 @@ uv add langchain-openai
 
 https://docs.tplr.ai/
 
-
 ## colab plugin usage
+
 !nvidia-smi
 
+## format code
+
+black ./\*
 
 ## plan 12-1 to 12-7
+
 day: langchain
 
-
-weekend: complete gpt2  nanoGPT implementation follow the video from karpathy
-
+weekend: complete gpt2 nanoGPT implementation follow the video from karpathy
 
 12-8 to 12-14
+
 ## pytorch

@@ -2,9 +2,11 @@
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, List
 
+
 class AgentState(TypedDict):
     numbers: List[int]
     result: int
+
 
 def add_numbers(state: AgentState) -> AgentState:
     """Add numbers"""
@@ -14,6 +16,7 @@ def add_numbers(state: AgentState) -> AgentState:
     state["result"] = state["result"] + first_number
     state["numbers"] = numbers
     return state
+
 
 def loop_node(state: AgentState) -> AgentState:
     """Loop node"""
@@ -31,10 +34,9 @@ graph.add_node("loop", loop_node)
 
 graph.add_edge(START, "add_numbers")
 # graph.add_edge("add_numbers", "loop")
-graph.add_conditional_edges("add_numbers", loop_node, {
-    "loop": "add_numbers",
-    "exit": END
-})
+graph.add_conditional_edges(
+    "add_numbers", loop_node, {"loop": "add_numbers", "exit": END}
+)
 
 app = graph.compile()
 
