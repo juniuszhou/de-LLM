@@ -1,4 +1,3 @@
-
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
 from IPython.display import Image, display
@@ -9,8 +8,9 @@ llm: BaseChatModel = ChatOpenAI(
     model="llama3.2:3b",
     temperature=0,
     base_url="http://localhost:11434/v1",
-    api_key="ollama"
+    api_key="ollama",
 )
+
 
 # Graph state
 class State(TypedDict):

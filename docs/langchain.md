@@ -41,3 +41,11 @@ standard executable component
 - tool message
 
 ## state saver, memory or sqlite
+
+# langchain
+
+## agent
+
+## model
+
+static model and dynamic model

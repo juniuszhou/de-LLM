@@ -1,9 +1,7 @@
 {
-  "$schema": "https://langgra.ph/schema.json",
-  "dependencies": ["."],
-  "graphs": {
-    "agent": "./dynamic_node.py:orchestrator_worker"
-  },
-  "env": ".env",
-  "image_distro": "wolfi"
+    "$schema": "https://langgra.ph/schema.json",
+    "dependencies": ["."],
+    "graphs": {"agent": "./dynamic_node.py:orchestrator_worker"},
+    "env": ".env",
+    "image_distro": "wolfi",
 }

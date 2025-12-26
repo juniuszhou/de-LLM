@@ -1,4 +1,3 @@
-
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -9,6 +8,7 @@ from langgraph.types import Send
 from pydantic import BaseModel, Field
 from typing import Annotated, List
 import operator
+
 
 # Schema for structured output to use in planning
 class Section(BaseModel):
@@ -25,11 +25,12 @@ class Sections(BaseModel):
         description="Sections of the report.",
     )
 
+
 llm: BaseChatModel = ChatOpenAI(
     model="llama3.2:3b",
     temperature=0,
     base_url="http://localhost:11434/v1",
-    api_key="ollama"
+    api_key="ollama",
 )
 
 # Augment the LLM with schema for structured output
@@ -135,4 +136,5 @@ display(Image(orchestrator_worker.get_graph().draw_mermaid_png()))
 state = orchestrator_worker.invoke({"topic": "Create a report on LLM scaling laws"})
 
 from IPython.display import Markdown
+
 Markdown(state["final_report"])

@@ -10,9 +10,7 @@ import os
 load_dotenv()
 
 model = ChatOpenAI(
-    model="gpt-4o-mini",
-    temperature=0,
-    openai_api_key=os.getenv("OPENAI_API_KEY")
+    model="gpt-4o-mini", temperature=0, openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
 server_params = StdioServerParameters(
@@ -20,7 +18,7 @@ server_params = StdioServerParameters(
     env={
         "FIRECRAWL_API_KEY": os.getenv("FIRECRAWL_API_KEY"),
     },
-    args=["firecrawl-mcp"]
+    args=["firecrawl-mcp"],
 )
 
 
@@ -34,7 +32,7 @@ async def main():
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that can scrape websites, crawl pages, and extract data using Firecrawl tools. Think step by step and use the appropriate tools to help the user."
+                    "content": "You are a helpful assistant that can scrape websites, crawl pages, and extract data using Firecrawl tools. Think step by step and use the appropriate tools to help the user.",
                 }
             ]
 
@@ -60,5 +58,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-    

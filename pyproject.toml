@@ -59,6 +59,8 @@ dependencies = [
     "tavily>=1.1.0",
     "langchain-chroma>=0.2.6",
     "black>=25.1.0",
+    "pydantic-ai>=0.8.1",
+    "fastapi>=0.125.0",
 ]
 
 [project.optional-dependencies]
@@ -161,4 +163,9 @@ exclude_lines = [
     "raise NotImplementedError",
     "if 0:",
     "if __name__ == .__main__.:",
+]
+
+[tool.uv.workspace]
+members = [
+    "projects/myGPT",
 ]
