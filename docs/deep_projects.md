@@ -17,3 +17,7 @@ https://github.com/PrimeIntellect-ai/prime
 ### open tensor
 
 Tamplar: https://github.com/one-covenant/templar
+
+### federated AI
+
+https://github.com/adap/flower
