@@ -17,6 +17,17 @@ world_size: total number of processes
 local size: processes per node
 
 FSDP:
+分片主要针对的是模型参数（parameters）和梯度（gradients）
+沿 dim=0 分片（通常是 out_features 或 hidden_dim 的第一个维度）
+
+FSDP 的分片针对的是 模型参数（weights）、梯度（gradients）和可选的优化器状态，
+输入和输出不分片，仍然是完整的（replicated）。
+
+模型参数被均匀分片（shard）到所有 GPU 上
+例如：Linear(4096, 4096) 的权重 [4096, 4096] （output features, input features）→ 每个 GPU 持 [4096, 4096/world_size]
+
+FSDP 是按照 output features 来把权重分片的。
+
 Fully Sharded Data Parallel (FSDP) in PyTorch
 Fully Sharded Data Parallel (FSDP) is a distributed training wrapper in PyTorch designed to shard (split) a model's parameters, gradients, and optimizer states across multiple GPUs or processes. This allows training very large models on hardware with limited memory per device, inspired by the ZeRO-3 technique from DeepSpeed. It's particularly useful for scaling models like large language models (LLMs) beyond what standard data parallelism can handle.
 
@@ -97,3 +108,22 @@ ColwiseParallel 把 weight（形状 [in_features, out_features]）沿 out_featur
 
 forward 没有 reduce，它的输出是分片的。
 backward 有梯度聚合。
+
+### pipeline 并行，是把整个计算分成不同的阶段，像是 CPU 的流水线。在第一组数据做第一个 stage 的计算，
+
+剩下的 GPU 空闲。
+然后第二个 GPU 计算数据组 1 的第二个阶段计算，第一个 GPU 开始第二组数据的计算。
+
+n_microbatches 是一个超参数来控制，分成多少个迷你 batch，也就是分成多少个阶段。
+
+### compare pipeline, sequence and Col/Row
+
+n_microbatches dim=0（batch 维度）切分
+Sequence Parallel dim=1 （sequence 维度）切分
+
+(Colwise/Rowwise) dim=-1 或 dim=1（hidden_dim） 按照特征切分。
+
+### FSDP 和 ColwiseParallel 比较：
+
+FSDP 是对整个模型的数据进行并行计算
+ColwiseParallel 对一个线性层的权重矩阵进行分片。
