@@ -1,0 +1,17 @@
+{
+  "os":  "Linux-6.14.0-37-generic-x86_64-with-glibc2.39",
+  "python":  "CPython 3.12.3",
+  "startedAt":  "2026-01-09T12:09:44.701449Z",
+  "program":  "/home/user/github/junius/de-LLM/ipynbs/tools/wandb.ipynb",
+  "codePath":  "/home/user/github/junius/de-LLM/ipynbs/tools/wandb.ipynb",
+  "codePathLocal":  "wandb.ipynb",
+  "git":  {
+    "remote":  "https://juniuszhou:@github.com/juniuszhou/de-LLM",
+    "commit":  "1faa73883ce1ae57025f2919fb54ee1ab672fc5a"
+  },
+  "email":  "junius.zhou@gmail.com",
+  "root":  "/home/user/github/junius/de-LLM/ipynbs/tools",
+  "host":  "user-X870-EAGLE-WIFI7",
+  "executable":  "/home/user/github/junius/de-LLM/.venv/bin/python",
+  "writerId":  "dytxrddq1897xfx1k9os1m5wdxsqqemm"
+}

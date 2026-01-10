@@ -1,5 +1,16 @@
 # Tech and Terms for distributed training.
 
+## 5D 并行。
+
+并行方式,维度,典型组合示例（GPU 数量）,适用场景
+DP,数据批次,ZeRO-3 / FSDP,通用加速
+TP,隐藏维度,TP=8,单层太大
+PP,模型层,PP=4,模型很深
+CP,序列长度,CP=4,超长上下文（>32k token）
+EP,MoE 专家,EP=8（8 experts）,MoE 模型
+
+Megatron-LM 和 DeepSpeed 是目前（2026 年）训练超大规模语言模型（LLM，如百亿到万亿参数级别）时最核心、最常用的两个分布式训练框架。
+
 ## tech
 
 ### DiLoCo
