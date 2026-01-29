@@ -1,7 +1,7 @@
 {
   // Enable format on save for Python files
   "editor.formatOnSave": true,
-  
+
   // Set Black as the default formatter for Python
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
@@ -10,21 +10,23 @@
       "source.organizeImports": "explicit"
     }
   },
-  
+
   // Also format Jupyter notebooks
   "[jupyter]": {
     "editor.formatOnSave": true
   },
-  
+
   // Python-specific settings
   "python.formatting.provider": "none",
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
-  
-  // Black formatter settings (will use pyproject.toml config)
-  "black-formatter.args": [
-    "--line-length=88"
-  ]
-}
 
+  // Black formatter settings (will use pyproject.toml config)
+  "black-formatter.args": ["--line-length=88"],
+  "python.testing.pytestArgs": [
+    "projects"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}
