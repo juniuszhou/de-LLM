@@ -20,6 +20,7 @@ DiLoCo（Distributed Low-Communication，分布式低通信优化）是由 DeepM
 ### PyTorch FSDP/DDP/DP
 
 DP: Data parallel. 数据并行
+Multi thread, single node. 受到python全局线程同步锁的限制，只是用于测试。
 
 DPP: Distributed Data Parallel
 a good mapping rule is: one process to one GPU
@@ -37,7 +38,13 @@ FSDP 的分片针对的是 模型参数（weights）、梯度（gradients）和�
 模型参数被均匀分片（shard）到所有 GPU 上
 例如：Linear(4096, 4096) 的权重 [4096, 4096] （output features, input features）→ 每个 GPU 持 [4096, 4096/world_size]
 
-FSDP 是按照 output features 来把权重分片的。
+FSDP2 是按照 output features 来把权重分片的。
+
+FSDP2 在 forward 的时候，会自动执行 all-gather，每个 rank 吧自己的参数发送出去。
+每个 rank 也接收其他的参数，让自己暂时拥有所有的参数，这样可以做完整的 forward 计算。
+在 forward 结束后，将其他的参数释放，只保留自己 rank 需要保存的份额。
+这个过程是在每一个 Module 单独进行的，因此如果一个模型有几十层，那么对显存的消耗，或者重复不会那么多。
+和单个 GPU 做所有计算，存贮所有参数相比。
 
 Fully Sharded Data Parallel (FSDP) in PyTorch
 Fully Sharded Data Parallel (FSDP) is a distributed training wrapper in PyTorch designed to shard (split) a model's parameters, gradients, and optimizer states across multiple GPUs or processes. This allows training very large models on hardware with limited memory per device, inspired by the ZeRO-3 technique from DeepSpeed. It's particularly useful for scaling models like large language models (LLMs) beyond what standard data parallelism can handle.
@@ -64,7 +71,8 @@ FSDP reduces the memory footprint per GPU by avoiding full model replication. In
 pipeline parallet:
 流水线并行，把每个层放到不同的 GPU 中训练，让 GPU 像流水线一样计算
 
-Tensor parallel
+#### Tensor parallel
+
 把不同的 Tensor 放到不同的 GPU 中训练，像 transformer 这样的模型，每个头是可以单独并行计算的。
 
 ## 核心概念
@@ -73,6 +81,15 @@ Tensor parallel
 DP 都是通过不同的程序都独立的采样数据来达到 DP 的效果。
 
 张量并行 (TP)：将模型参数（张量，如权重矩阵）分片到多个设备上，每个设备计算部分操作（e.g., 矩阵乘法的部分行/列）。需要频繁通信交换中间结果。
+
+快速记忆口诀
+
+想让输出被切片（中间结果 shard） → 用 Colwise
+想把切片的结果再合起来（最终输出 replicate） → 用 Rowwise
+
+权重矩阵切分方式
+按列切分 Colwise （沿着输出维度切） weight.shape = (out_features, in_features) → 切成多个 (out_features/TP_degree, in_features)
+按行切分 Rowwise （沿着输入维度切） weight.shape = (out_features, in_features) → 切成多个 (out_features, in_features/TP_degree)
 
 现代框架支持 3D 并行（DP + TP + Pipeline
 否则 TP 跨节点会变慢（推荐 TP 在节点内）
@@ -138,3 +155,34 @@ Sequence Parallel dim=1 （sequence 维度）切分
 
 FSDP 是对整个模型的数据进行并行计算
 ColwiseParallel 对一个线性层的权重矩阵进行分片。
+
+### Rendezvous
+
+Rendezvous in PyTorch is the mechanism that allows multiple processes (usually one per GPU) to find and connect to each other at the beginning of distributed training.
+It is the very first step of distributed communication — before any all_reduce, broadcast, all_gather, etc. can happen.
+
+### all gather vs all reduce
+
+all-gather 只是把数据做汇总，all-gather后所有节点都会有完整的数据
+all-reduce 会把数据做计算，比如平均值，总值等
+
+### ColwiseParallel RowwiseParallel 过程，在只有二个Linear层的情况下，如何通信
+
+输入 X 是 Replicate（所有 GPU 都有完整拷贝）
+
+↓
+第一个 Linear 用 ColwiseParallel
+↓
+每个 GPU 只计算自己负责的那部分输出列 → 结果是 Shard(-1)
+↓
+**PyTorch 自动插入 All-Gather** → 把所有分片拼接起来，得到完整的中间激活（通常还是 Replicate 或 Shard，看后续需求）
+↓
+做 activation (silu / gelu 等) → 还是保持相同的分布
+↓
+第二个 Linear 用 RowwiseParallel
+↓
+每个 GPU 拿到的输入已经是 Shard(-1)，本地做部分 matmul
+↓
+**PyTorch 自动插入 All-Reduce** → 把各 GPU 的部分和求和，得到正确的完整输出（通常变回 Replicate）
+↓
+输出给下一层

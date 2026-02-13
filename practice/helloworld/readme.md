@@ -24,6 +24,12 @@ torchrun --nnodes=1 --nproc_per_node=2 --rdzv_id=101 --rdzv_endpoint="localhost:
 torchrun --nnodes=1 --nproc_per_node=2 simple_model_fsdp2.py
 ```
 
+## start TP
+
+```shell
+torchrun --nnodes=1 --nproc_per_node=2 simple_model_tp.py
+```
+
 | Aspect                          | DataParallel (DP)                                           | DistributedDataParallel (DDP)                              | Winner (2025–2026)            |
 | ------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------- |
 | Parallelism type                | Single-process, multi-threaded                              | Multi-process (one process per GPU)                        | **DDP**                       |

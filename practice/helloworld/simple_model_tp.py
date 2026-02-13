@@ -86,7 +86,7 @@ if __name__ == "__main__":
         model,
         device_mesh=mesh,
         parallelize_plan={
-            # "embedding": ColwiseParallel(),
+            # "embedding": RowwiseParallel(),
             "linear1": ColwiseParallel(),
             "linear2": RowwiseParallel(),
         },
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
             # length = ((len(result) - 1) // 10) * 10
 
-            # lentgh must be the same between all ranks.
+            # lentgh must be the same between all ranks. so we use the fixed batch size.
             length = sequence_length * 2
             result = result[: length + 1]
             # print(type(result))
@@ -108,13 +108,16 @@ if __name__ == "__main__":
             data_tensor = data_tensor.view(-1, 10)
 
             output_tensor = torch.tensor(result[1:])
+            # output_tensor = torch.distributed.all_gather(output_tensor)
+            print(f"rank [{rank}]: output_tensor shape: ", output_tensor.shape)
+
             # shape: (batch_size, sequence_length)
             output_tensor = output_tensor.view(-1, 10)
             # print("output_tensor shape: ", output_tensor.shape)
 
             # shape: (batch_size, sequence_length, vocab_size)
             output = tp_model(data_tensor)
-            # print("output shape: ", output.shape)
+            print(f"rank [{rank}]: output shape: ", output.shape)
 
             loss = F.cross_entropy(
                 output.view(-1, output.size(-1)),
