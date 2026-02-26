@@ -90,3 +90,9 @@ softmax the distance will be magnified a lot.
 RMS Norm 快，训练稳定，节省显存。不减均值 （mean subtraction），少了一个参数去学习
 
 ### sliding window attention
+
+## lesson 5
+
+### reasoning
+
+chain of thought.
