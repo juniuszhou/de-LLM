@@ -46,3 +46,53 @@ Preference / Alignment Tuning（DPO / ORPO / RLHF / RLVR 等）
 
 - Safety / Red-teaming Tuning（可选最后一步）
   专门针对 jailbreak、敏感话题、安全性再做一轮 SFT 或 preference tuning
+
+## tuning types
+
+### PEFT parameter efficient fine tuning
+
+adapt large models by training a small number of additional parameters while keeping the base model frozen.
+原来的模型不动，只对一些参数进行tuning。
+
+### LoRA
+
+LoRA 是 PEFT 的一种
+LoRA has become the most widely adopted PEFT method
+
+It works by adding small rank decomposition matrices to the attention weights, typically reducing trainable parameters by about 90%.
+
+LoRA adapter（客服、代码、法律、医疗等）
+是的，每个 LoRA adapter 通常是用不同的数据集（或同一数据集的不同部分/不同目标）独立训练出来的结果。
+
+### OLoRA
+
+OLoRA utilizes QR decomposition to initialize the LoRA adapters.
+OLoRA 的核心创新在于 LoRA adapter（A 和 B 矩阵）的初始化方式：它使用 QR 分解（或类似正交化过程）来初始化低秩矩阵，使其满足 正交（orthonormal） 属性，而不是标准 LoRA 的默认初始化（A 用 Kaiming-uniform 随机，B 初始化为 0）。
+
+OLoRA 初始化 adapter 的最大卖点就是“更快收敛 + 更高天花板 + 更稳定”，几乎是零成本的升级（计算开销忽略不计）。
+
+## Preference Tuning
+
+### DPO direct preference optimization
+
+把偏好数据直接转成分类损失，最简单最稳
+
+### KTO Kahneman-Tversky Optimization
+
+数据只有好和坏的评价，没有二个数据之间的比较
+
+### GRPO / RLVR Reinforcement Learning with Verifiable Rewards 针对reasoning模型
+
+deterministic & verifiable
+典型奖励例子（通常是 0/1 binary，或带格式分）：
+数学：最终 boxed 答案是否与标准答案字符串匹配（或用 sympy 执行验证）
+代码：生成的代码在 hidden test cases 上是否全部通过
+逻辑 puzzle / GSM8K / AIME：答案对错
+格式遵守：是否严格遵循 <think>…</think><answer>…</answer> 结构
+多步工具调用：是否最终调用正确 API 并得到预期输出
+优点：
+无需昂贵的人类偏好标注或训练 Reward Model
+奖励信号干净、无噪声 → 训练更稳定
+可无限自生成数据（采样 → 验证 → 继续）
+缺点：
+只适用于有明确对错的领域（math/code/logic），不适合 open-ended chat、创意写作、安全对齐

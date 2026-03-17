@@ -27,6 +27,9 @@ print(DEFAULT_DATA_PATH)
 DEFAULT_OUTPUT_PATH = Path(__file__).resolve().parent / "sft_output"
 print(DEFAULT_OUTPUT_PATH)
 
+DEFAULT_RESULTS_PATH = Path(__file__).resolve().parent / "results" / "sft_output"
+print(DEFAULT_RESULTS_PATH)
+
 
 def resolve_model_path(model_path: Path) -> Path:
     """Resolve model path, trying common locations."""
@@ -220,8 +223,8 @@ def main():
     )
 
     peft_config = LoraConfig(
-        r=8,
-        lora_alpha=128,
+        r=8,  # rank
+        lora_alpha=16,  # scaling factor
         target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
         lora_dropout=0.1,
         bias="none",
@@ -237,9 +240,9 @@ def main():
         fp16=False,
         bf16=True,  # Avoid "not implemented for BFloat16" AMP error
         logging_steps=10,
-        save_steps=100,
+        save_steps=25,
         save_total_limit=2,
-        warmup_steps=50,
+        warmup_steps=10,
         report_to="none",
         optim="paged_adamw_8bit" if not args.no_4bit else "adamw_torch",
         lr_scheduler_type="cosine",
@@ -256,8 +259,8 @@ def main():
 
     print("Starting training...")
     trainer.train()
-    trainer.save_model()
-    tokenizer.save_pretrained(args.output_dir)
+    trainer.save_model(output_dir=DEFAULT_RESULTS_PATH)
+    tokenizer.save_pretrained(DEFAULT_RESULTS_PATH)
     print(f"Model saved to {args.output_dir}")
 
 

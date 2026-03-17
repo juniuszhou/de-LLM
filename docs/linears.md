@@ -25,6 +25,12 @@ LayerNorm 的核心作用（一句话总结）
 
 Norm 发生在整个 batch 数据中，没有每个 token 的向量做 Norm 更细粒度。
 
-
 # 是的，在大多数情况下，梯度的“长度”（或者说梯度的维度）确实和输出特征（output features）的个数是一样的，
+
 # linear 层在做 forward 计算的时候会记录下 input，这样就可以在backward的时候用它来计算梯度了
+
+## why activation
+
+Without activation functions, stacking multiple linear transformations is pointless:
+如果没有activation，在多层的Linear叠加都只是Linear模型的组合。
+activation使得模型有了非线性化的特征

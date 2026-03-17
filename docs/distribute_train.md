@@ -186,3 +186,33 @@ all-reduce 会把数据做计算，比如平均值，总值等
 **PyTorch 自动插入 All-Reduce** → 把各 GPU 的部分和求和，得到正确的完整输出（通常变回 Replicate）
 ↓
 输出给下一层
+
+### CP 的实现
+
+CP 最主流的两种实现方式（2025–2026年主流做法）
+核心逻辑是：每个 GPU 只永久持有自己负责的那一小块 Q（对应本地序列段），而 KV 是轮流借用的。最终每个 GPU 计算出的 O（attention 输出） 也是只对应自己那一段序列的输出。
+
+Ring-Attention / Megatron-CP（最常见）
+把一个很长的序列（比如128k、256k、1M）平均切成 N 份
+第 i 个 GPU 只持有第 i 段的 Q、K、V（显存只存 1/N）
+但计算 attention 时，每个 token 的 Q 理论上要看到全部的 K、V
+所以他们用“环形传递 + 分块计算”的方式来解决：
+计算过程（简化版）：
+每个 GPU 先用自己本地的 KV block 计算 local attention（对自己负责的那一段）
+然后把自己的 KV block 顺时针传给下一个 GPU（Ring all-to-all 通信）
+收到别人的 KV block 后再算 cross-block 的 attention
+重复 N-1 次，把整个序列的 KV 都“轮询”一遍
+最终每个 GPU 都能得到完整的 attention 输出，但显存峰值只用了 1/N 左右
+这就是为什么叫 Ring-Attention，本质是把全局 attention 拆成多次局部计算 + 环形传递。
+DeepSpeed-Ulysses 风格的 Sequence Parallel
+也是切序列，但通信模式不同
+更多依赖 All-Gather + Reduce-Scatter
+前向时把所有 KV 临时 gather 起来算 attention
+反向时再 scatter 梯度
+显存节省不如 Ring 激进，但通信模式更简单，在某些硬件上可能更快
+
+### SequenceParallel
+
+SequenceParallel 本身不 reduce，但當下一個模塊（尤其是 ColwiseParallel）需要 Replicate 輸入時，DTensor 會自動在 forward 時插入 all-gather 把 Shard(1) 變 Replicate；
+backward 時反過來會 reduce-scatter 或 all-reduce 來同步 gradient。
+你只要正確設定 input/output layouts，同步就自動發生，不需要手動寫 dist.all_reduce。
