@@ -1,5 +1,7 @@
 from typing import TypedDict
-from langgraph.graph import StateGraph, START, END
+
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph import END, START, StateGraph
 
 
 class State(TypedDict):
@@ -15,6 +17,7 @@ def generate_joke(state: State):
     return {"joke": f"This is a joke about {state['topic']}"}
 
 
+checkpointer = InMemorySaver()
 graph = (
     StateGraph(State)
     .add_node(refine_topic)
@@ -22,15 +25,22 @@ graph = (
     .add_edge(START, "refine_topic")
     .add_edge("refine_topic", "generate_joke")
     .add_edge("generate_joke", END)
-    .compile()
+    .compile(checkpointer=checkpointer)
 )
+
+# Same thread_id must be used for invoke/stream and get_state so they refer to one checkpoint.
+config = {"configurable": {"thread_id": "demo-thread-1"}}
 
 # The stream() method returns an iterator that yields streamed outputs
 # actually they are states of the graph in each node
 for chunk in graph.stream(
     {"topic": "ice cream"},
+    config=config,
     # Set stream_mode="updates" to stream only the updates to the graph state after each node
     # Other stream modes are also available. See supported stream modes for details
     stream_mode="updates",
 ):
     print(chunk)
+
+snapshot = graph.get_state(config)
+print(snapshot.values)
