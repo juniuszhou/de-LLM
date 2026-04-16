@@ -54,6 +54,12 @@ def end_node(state: AgentState) -> AgentState:
 
 def interrupt_node(state: AgentState) -> AgentState:
     approved = interrupt({"error": "what is your problem?"})
+    print("approved from interrupt node: ", approved)
+    name = input("Please enter your name: ")
+    if name == "exit":
+        approved = True
+    else:
+        approved = False
     return {"messages": approved}
 
 
@@ -93,7 +99,9 @@ def simple_interrupt_graph():
     )
 
     result = graph.invoke({"messages": "I am junius."}, config=config)
+    print("=" * 50)
     print_interrupt_in_result(result)
+    print("=" * 50)
 
     # resume the graph from the interrupt node
     result = graph.invoke(Command(resume=True), config=config)
