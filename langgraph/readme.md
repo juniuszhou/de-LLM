@@ -39,6 +39,21 @@ multiple node returned state will be reduced later according to the order.
 
 dynamic to set the message flow
 
+## Durable Execution
+
+Duration 针对的是checkpoint， 不是store。
+
+是为了保证graph可以在中断后，继续执行。所以在设计graph的执行的时候，需要考虑这个。
+比如官网提到的，如果在 @entrypoint里面做打开文件，写入的操作，那么会重复执行。
+
+但是你使用一个node来执行就不会，因为在上一个superstep执行过了，checkpoint 会记住graph的状态。
+这样当恢复的时候，就会跳过这个node的调用了。
+
+durability="sync"
+exit persist change when program exit. no persist if crash.
+sync persist after each superstep, guarantee persist is completed
+async persist async, no guarantee persist is completed
+
 ## Pregel
 
 ### channels

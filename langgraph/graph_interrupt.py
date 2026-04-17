@@ -53,14 +53,10 @@ def end_node(state: AgentState) -> AgentState:
 
 
 def interrupt_node(state: AgentState) -> AgentState:
-    approved = interrupt({"error": "what is your problem?"})
-    print("approved from interrupt node: ", approved)
-    name = input("Please enter your name: ")
-    if name == "exit":
-        approved = True
-    else:
-        approved = False
-    return {"messages": approved}
+    # interrupt here and wait for the human to input the problem.
+    problem = interrupt({"error": "what is your problem?"})
+    print("problem description from human: ", problem)
+    return {"messages": problem}
 
 
 # to demo how to interrupt like static way. to ask the graph to interrupt at a specific node.
@@ -104,7 +100,7 @@ def simple_interrupt_graph():
     print("=" * 50)
 
     # resume the graph from the interrupt node
-    result = graph.invoke(Command(resume=True), config=config)
+    result = graph.invoke(Command(resume="I am sick today"), config=config)
     print(result)
 
 
